@@ -1,0 +1,6 @@
+$arrcomputer= gc -path "Provide Path to servers"
+### change the path below in $path in export-csv
+foreach ( $Computer in $arrComputer ) {  
+    $nwINFO = Get-WmiObject -ComputerName $Computer Win32_NetworkAdapterConfiguration | Where-Object { $_.IPAddress -ne $null }|Select-Object @{l="ServerName";e={$Computer}},DHCPEnabled,@{l="IPaddress";e={$_.ipaddress -join " "}},@{l="Gateway"; e={$_.DefaultIPGateway}},@{l="Subnet";e={$_.IPSubnet}},MACAddress,Description|Export-Csv $path -Append -Force}
+ 
+     

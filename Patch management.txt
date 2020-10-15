@@ -1,0 +1,70 @@
+################################# Provide your own path wherever it is highlighted as provide path ######################
+$comp= gc "Provide path\serverlist.txt"
+$infoObject=@()
+$results=@()
+foreach($co in $comp)
+{
+$co
+$css = @"
+<style>
+h1, h5, th { text-align: center; font-family: Segoe UI; }
+table { margin: auto; font-family: Segoe UI; box-shadow: 10px 10px 5px #888; border: thin ridge grey; }
+th { background: #0046c3; color: #fff; max-width: 400px; padding: 5px 10px; }
+td { font-size: 11px; padding: 5px 20px; color: #000; }
+tr { background: #b8d1f3; }
+tr:nth-child(even) { background: #dae5f4; }
+tr:nth-child(odd) { background: #b8d1f3; }
+</style>
+"@
+$infoObject = New-Object PSObject
+$p=Test-Connection -ComputerName $co -BufferSize 16  -Count 1 -Quiet 
+$p
+$hotfix= Get-WmiObject -Class Win32_quickfixengineering -ComputerName $co |select Hotfixid -Last 3
+$h=($hotfix|select @{Name="fixes" ;expression={$hotfix.hotfixid -join ","}} -Last 1).fixes
+$h
+$description = Get-WmiObject -Class Win32_quickfixengineering -ComputerName $co|select -ExpandProperty Description  -last 1
+$description
+$installedby=Get-WmiObject -Class Win32_quickfixengineering -ComputerName $co|select -ExpandProperty Installedby  -last 1
+$installedby
+$installedon=Get-WmiObject -Class Win32_quickfixengineering -ComputerName $co|select -ExpandProperty Installedon  -last 1
+$installedon
+$Boottime= Get-WmiObject win32_operatingsystem 
+$b=($boottime| select @{LABEL=’LastBootUpTime’;EXPRESSION={$_.ConverttoDateTime($_.lastbootuptime)}}).Lastbootuptime
+$b
+$service=Get-WmiObject -ClassName Win32_Service -Filter "StartMode='Auto' AND State<>'Running'"
+$r=($service|select  @{Name="Service" ;expression={$service.name -join ","}} -Last 1).service
+$r
+$infoObject|Add-Member -MemberType NoteProperty -Name "Hostname"  -value $co
+$infoObject|Add-Member -MemberType NoteProperty -Name "Reachable"  -value $p
+$infoObject|Add-Member -MemberType NoteProperty -Name "Uptime"  -value $b
+$infoObject|Add-Member -MemberType NoteProperty -Name "Hotfix ID" -Value $h
+$infoObject|Add-Member -MemberType NoteProperty -Name "Installed On" -Value $installedon
+$infoObject|Add-Member -MemberType NoteProperty -Name "Installed By" -Value $installedby
+$infoObject|Add-Member -MemberType NoteProperty -Name "Description" -Value $description
+$infoObject|Add-Member -MemberType NoteProperty -Name "Auto Stopped services" -Value $r
+
+$results+=$infoObject
+}
+
+
+$results|Export-csv "Cprovide path\ser6.csv" -NoTypeInformation 
+Import-CSV "above path\ser6.csv" | ConvertTo-Html -Head $css  | Out-File "provide path \ser4.html" 
+
+##################### Sending Mail ############################
+
+$smtpServer = "Provide SMTP server" 
+  $smtp = New-Object Net.Mail.SmtpClient($smtpServer) 
+  $msg = New-Object Net.Mail.MailMessage 
+  $msg.To.Add("provide to Address")
+  #$msg.cc.add("") 
+        $msg.From = "Provide from address" 
+  $msg.Subject = "Patch Report $(Get-Date)"
+        $msg.IsBodyHTML = $true 
+        $msg.Body = get-content "provide html address\ser4.html"
+        $msg.Attachments.Add( "provide html address\ser4.html")
+  $smtp.Send($msg) 
+        $body = ""
+
+ 
+ 
+ 
