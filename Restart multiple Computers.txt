@@ -1,0 +1,5 @@
+$a= "a","b"."c"
+foreach($b in $a)
+{
+Restart-Computer -ComputerName $b
+}

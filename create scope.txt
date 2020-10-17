@@ -1,0 +1,9 @@
+########## Create a CSV #############
+
+########## COntent #################
+## Name,StartRange,Endrange,Subnetmask ##
+## test-lab,172.0.0.1,172.0.0.255,255.0.0.0 ##
+
+#######################################
+
+import-csv "provide path of csv"|Foreach { add-dhcpserverv4scope -startrange $_.startrange -endrange $_.endrange -Name $_.Name -subnetmask $_.Subnetmask}

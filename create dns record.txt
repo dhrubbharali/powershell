@@ -1,0 +1,6 @@
+################ Create a csv file ########################
+################with column Name and IP ###################
+
+################ Provide Name of the server in name and Ip address in IP ###################
+
+import-csv "provide path of csv"| foreach {Add-DnsserverResourceRecordA -Name $_.Name -IPv4Address $_.ip -ZoneName "provide domain Name" -ComputerName "DC Name"
