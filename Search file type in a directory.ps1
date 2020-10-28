@@ -1,0 +1,1 @@
+get-childitem -path C:\ -include *txt -Recurse| select Directory, Name |export-csv C:\filetype.csv
